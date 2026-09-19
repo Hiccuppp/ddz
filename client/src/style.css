@@ -1,39 +1,42 @@
 *{box-sizing:border-box}
 html,body,#app{width:100%;height:100%;margin:0;overflow:hidden}
-button,select{font:inherit}
+button,select,input{font:inherit}
 .game{height:100%;min-height:100%;background:radial-gradient(circle at center,#147447 0,#075b31 70%);color:#fff;display:flex;flex-direction:column;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;user-select:none;-webkit-user-select:none}
 .rotate{margin:auto;font-size:26px;font-weight:700}
-.topbar{height:38px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:rgba(0,0,0,.18);font-size:13px}
-.opponent{height:17%;min-height:72px;text-align:center;padding-top:5px}
+.topbar{height:38px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;background:rgba(0,0,0,.18);font-size:13px}
+.scoreline{font-weight:800;color:#ffe27d}
+.manage-button{height:28px;border:0;border-radius:14px;padding:0 12px;background:#6f3f99;color:#fff;font-weight:700}
+.opponent{height:15%;min-height:64px;text-align:center;padding-top:4px}
 .player-title{font-size:13px;opacity:.95;margin-bottom:4px}
-.turn-tag{display:inline-block;margin-left:8px;padding:2px 7px;border-radius:10px;background:#ffd65c;color:#3e2e00;font-weight:700}
-.backs{height:48px;display:flex;justify-content:center;align-items:center}
+.turn-tag,.identity-tag{display:inline-block;margin-left:6px;padding:2px 7px;border-radius:10px;background:#ffd65c;color:#3e2e00;font-weight:700}
+.identity-tag{background:#f0933b;color:#fff}
+.identity-tag.farmer{background:#d9e8d5;color:#245030}
+.backs{height:44px;display:flex;justify-content:center;align-items:center}
 .back{display:inline-flex;width:27px;height:42px;margin-left:-13px;border:2px solid #fff;border-radius:4px;background:#163b86;align-items:center;justify-content:center;font-size:28px;overflow:hidden;box-shadow:0 2px 4px rgba(0,0,0,.3)}
 .back:first-child{margin-left:0}
-.table-center{flex:1;min-height:92px;display:flex;flex-direction:column;justify-content:center;padding:0 12px}
-.info-row{display:grid;grid-template-columns:90px 1fr 110px;align-items:center;gap:10px}
-.info-box{display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;min-height:58px;background:rgba(0,0,0,.12);border-radius:10px;padding:4px}
+.table-center{flex:1;min-height:86px;display:flex;flex-direction:column;justify-content:center;padding:0 12px}
+.info-row{display:grid;grid-template-columns:90px 1fr 125px;align-items:center;gap:10px}
+.info-box{display:flex;align-items:center;justify-content:center;gap:5px;font-size:12px;min-height:55px;background:rgba(0,0,0,.12);border-radius:10px;padding:4px}
+.multiplier-box{flex-wrap:wrap}
+.multiplier-box small{width:100%;color:#ffe27d}
 .bottom-cards{display:flex}
 .bottom-cards .card+.card{margin-left:-12px}
-.play-area{min-height:66px;display:flex;align-items:center;justify-content:center}
+.play-area{min-height:62px;display:flex;align-items:center;justify-content:center}
 .last-play{display:flex;align-items:center;justify-content:center}
 .last-play .card+.card{margin-left:-8px}
 .hint{opacity:.82;font-size:14px}
-.message{height:22px;text-align:center;font-size:13px;padding-top:3px}
+.message{height:21px;text-align:center;font-size:13px;padding-top:3px}
 .message.error{color:#ffd1d1;font-weight:700}
-.admin-panel{height:68px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;background:rgba(77,23,111,.38);padding:5px 10px}
-.admin-hand{min-width:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.admin-label{font-size:11px;margin-right:8px;white-space:nowrap}
-.admin-hand .card+.card{margin-left:-16px}
-.admin-hand .card.selected{transform:translateY(-5px);border-color:#ffe26f}
-.admin-controls{display:flex;gap:5px;align-items:center}
-.admin-controls select,.admin-controls button{height:30px;border:0;border-radius:6px;padding:0 7px}
-.admin-controls button{background:#f1ce59;color:#352900;font-weight:700}
-.admin-controls button:disabled{opacity:.45}
-.my-area{height:30%;min-height:112px;display:flex;flex-direction:column;justify-content:flex-end}
-.hand-row{height:86px;display:flex;justify-content:center;align-items:flex-end;padding:0 22px 4px;overflow:visible}
+.admin-peek{height:56px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:rgba(77,23,111,.35);padding:3px 8px;gap:3px}
+.admin-label{font-size:10px;white-space:nowrap;margin-right:3px}
+.admin-peek .card+.card{margin-left:-17px}
+.admin-peek .card.selected{transform:translateY(-4px);border-color:#ffe26f}
+.admin-peek select,.admin-peek button{height:28px;border:0;border-radius:5px;padding:0 5px;flex:0 0 auto}
+.admin-peek button{background:#f1ce59;color:#352900;font-weight:700}
+.my-area{height:30%;min-height:108px;display:flex;flex-direction:column;justify-content:flex-end}
+.hand-row{height:84px;display:flex;justify-content:center;align-items:flex-end;padding:0 22px 4px;overflow:visible;touch-action:none}
 .hand-row .card+.card{margin-left:-18px}
-.card{position:relative;width:44px;height:68px;padding:4px 3px;border:1px solid #d2d2d2;border-radius:6px;background:#fff;color:#171717;box-shadow:0 2px 5px rgba(0,0,0,.32);display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;transition:transform .12s ease,border-color .12s ease;flex:0 0 auto}
+.card{position:relative;width:44px;height:68px;padding:4px 3px;border:1px solid #d2d2d2;border-radius:6px;background:#fff;color:#171717;box-shadow:0 2px 5px rgba(0,0,0,.32);display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;transition:transform .10s ease,border-color .10s ease;flex:0 0 auto;touch-action:none}
 .card.selected{transform:translateY(-18px);border:2px solid #ffd34d}
 .card.red{color:#cf202d}
 .card.joker .rank{font-size:12px;writing-mode:vertical-rl}
@@ -42,24 +45,35 @@ button,select{font:inherit}
 .card.compact{width:34px;height:50px;padding:3px}
 .card.compact .rank{font-size:12px}
 .card.compact .suit{font-size:13px}
-.actions{height:58px;display:flex;align-items:center;justify-content:center;gap:14px;padding-bottom:max(4px,env(safe-area-inset-bottom));background:rgba(0,0,0,.12)}
+.actions{height:56px;display:flex;align-items:center;justify-content:center;gap:14px;padding-bottom:max(4px,env(safe-area-inset-bottom));background:rgba(0,0,0,.12)}
 .actions button{min-width:82px;height:38px;border:0;border-radius:19px;padding:0 17px;background:rgba(255,255,255,.92);color:#20422d;font-weight:700;box-shadow:0 2px 5px rgba(0,0,0,.2)}
 .actions button.primary{background:#f3c746;color:#3a2b00}
 .actions button:disabled{opacity:.4}
 .waiting-action{font-size:14px;opacity:.78}
-.winner{font-size:20px;font-weight:800;color:#ffe07b}
+.winner{font-size:16px;font-weight:800;color:#ffe07b}
+
+.admin-drawer{position:absolute;right:8px;top:42px;width:285px;max-height:calc(100% - 50px);overflow:auto;z-index:20;background:rgba(27,22,35,.97);border:1px solid rgba(255,255,255,.18);border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.45);padding:10px}
+.drawer-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.drawer-title button{width:28px;height:28px;border:0;border-radius:50%;background:#444;color:#fff}
+.drawer-section{display:grid;gap:6px;padding:8px 0;border-top:1px solid rgba(255,255,255,.12)}
+.drawer-section label{display:grid;grid-template-columns:1fr 90px;align-items:center;font-size:12px;gap:6px}
+.drawer-section input{width:100%;height:30px;border:0;border-radius:5px;padding:0 7px}
+.drawer-section button{min-height:32px;border:0;border-radius:6px;padding:5px 8px;background:#eee;color:#222;font-weight:700}
+.drawer-section button.primary{background:#f0ca47}
+.drawer-section.danger button{background:#7a3030;color:#fff}
 
 @media (max-height:430px){
   .topbar{height:30px}
-  .opponent{height:14%;min-height:54px}
-  .backs{height:34px}
-  .back{height:32px;width:22px;font-size:22px}
-  .table-center{min-height:74px}
-  .info-row{grid-template-columns:78px 1fr 96px}
-  .admin-panel{height:58px}
-  .admin-hand .card{height:42px;width:30px}
-  .my-area{height:28%;min-height:96px}
-  .hand-row{height:72px}
-  .card{width:40px;height:61px}
-  .actions{height:48px}
+  .opponent{height:13%;min-height:48px}
+  .backs{height:30px}
+  .back{height:30px;width:21px;font-size:20px}
+  .table-center{min-height:68px}
+  .info-row{grid-template-columns:78px 1fr 112px}
+  .admin-peek{height:50px}
+  .admin-peek .card{height:40px;width:29px}
+  .my-area{height:28%;min-height:90px}
+  .hand-row{height:68px}
+  .card{width:39px;height:59px}
+  .actions{height:46px}
+  .admin-drawer{top:34px;width:265px}
 }
