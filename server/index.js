@@ -19,7 +19,6 @@ function stateFor(role){
   const opponentRole=otherRole(role);
   const opponent=game.players[opponentRole];
   const revealBottom=['playing','finished'].includes(game.phase);
-
   return {
     role,
     phase:game.phase,
@@ -53,28 +52,22 @@ function broadcast(){
 
 io.on('connection',socket=>{
   socket.on('join',({role,key}={})=>{
-    if(!['admin','player'].includes(role)){
-      return socket.emit('joinError','无效玩家类型');
-    }
-    if(role==='admin' && key!==process.env.ADMIN_KEY){
-      return socket.emit('joinError','管理员密码错误');
-    }
+    if(!['admin','player'].includes(role)) return socket.emit('joinError','无效玩家类型');
+    if(role==='admin' && key!==process.env.ADMIN_KEY) return socket.emit('joinError','管理员密码错误');
     if(socket.role) return;
-    if(game.players[role]){
-      return socket.emit('joinError',role==='admin'?'管理员位置已占用':'房间已满');
-    }
-    if(Object.keys(game.players).length>=2){
-      return socket.emit('joinError','房间已满');
-    }
+    if(game.players[role]) return socket.emit('joinError',role==='admin'?'管理员位置已占用':'房间已满');
+    if(Object.keys(game.players).length>=2) return socket.emit('joinError','房间已满');
 
     game.players[role]={id:socket.id,hand:[]};
     socket.role=role;
-
     if(game.players.admin && game.players.player) deal(game);
     broadcast();
   });
 
-  registerGameEvents(socket,game,broadcast);
+  registerGameEvents(socket,game,broadcast,(role,message)=>{
+    const target=game.players[role];
+    if(target) io.to(target.id).emit('notice',message);
+  });
 
   socket.on('disconnect',()=>{
     if(!socket.role) return;
