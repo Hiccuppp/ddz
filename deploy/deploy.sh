@@ -83,6 +83,7 @@ EOF
 echo "[3/7] Installing Node dependencies..."
 cd "$APP_DIR/server"
 if [[ -f package-lock.json ]]; then npm ci; else npm install; fi
+npm test
 
 cd "$APP_DIR/client"
 if [[ -f package-lock.json ]]; then npm ci; else npm install; fi
