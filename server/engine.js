@@ -24,12 +24,26 @@ function finishIfWon(game){
   return false;
 }
 
-export function playTurn(game,role,cards){
+function canonicalCards(hand,requested){
+  if(!Array.isArray(requested) || requested.length===0) return null;
+
+  const ids=requested.map(card=>typeof card==='string' ? card : card?.id);
+  if(ids.some(id=>!id) || new Set(ids).size!==ids.length) return null;
+
+  const byId=new Map(hand.map(card=>[card.id,card]));
+  const cards=ids.map(id=>byId.get(id));
+  if(cards.some(card=>!card)) return null;
+  return cards;
+}
+
+export function playTurn(game,role,requestedCards){
   const player=game.players[role];
   if(!player) return {ok:false,error:'玩家不存在'};
   if(game.phase!=='playing') return {ok:false,error:'当前不是出牌阶段'};
   if(game.turn!==role) return {ok:false,error:'还没轮到你'};
-  if(!Array.isArray(cards) || cards.length===0) return {ok:false,error:'请选择要出的牌'};
+
+  const cards=canonicalCards(player.hand,requestedCards);
+  if(!cards) return {ok:false,error:'手牌校验失败'};
 
   const analyzed=analyze(cards);
   if(!analyzed) return {ok:false,error:'牌型不合法'};
