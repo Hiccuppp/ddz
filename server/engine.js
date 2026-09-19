@@ -1,24 +1,27 @@
 import {analyze,canBeat,removeCards} from './play.js';
 import {otherRole} from './game.js';
+import {settleRound} from './scoring.js';
+
+function finish(game,winner){
+  game.phase='finished';
+  game.winner=winner;
+  game.turn=null;
+  settleRound(game,winner);
+  return true;
+}
 
 function finishIfWon(game){
   const landlord=game.landlord;
   if(!landlord) return false;
 
   if(game.players[landlord].hand.length===0){
-    game.phase='finished';
-    game.winner=landlord;
-    game.turn=null;
-    return true;
+    return finish(game,landlord);
   }
 
   const farmer=otherRole(landlord);
   const farmerCount=game.players[farmer].hand.length;
   if(farmerCount===0 || farmerCount<=game.robCount){
-    game.phase='finished';
-    game.winner=farmer;
-    game.turn=null;
-    return true;
+    return finish(game,farmer);
   }
 
   return false;
@@ -26,7 +29,6 @@ function finishIfWon(game){
 
 function canonicalCards(hand,requested){
   if(!Array.isArray(requested) || requested.length===0) return null;
-
   const ids=requested.map(card=>typeof card==='string' ? card : card?.id);
   if(ids.some(id=>!id) || new Set(ids).size!==ids.length) return null;
 
