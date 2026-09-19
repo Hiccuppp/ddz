@@ -22,7 +22,8 @@ export function createGame(){
     lastPlay:null,
     lastCards:[],
     lastPlayRole:null,
-    winner:null
+    winner:null,
+    adminMutationSeq:0
   };
 }
 
@@ -47,6 +48,7 @@ export function deal(game){
   game.lastCards=[];
   game.lastPlayRole=null;
   game.winner=null;
+  game.adminMutationSeq=0;
   game.phase='call';
   return game;
 }
@@ -103,4 +105,5 @@ export function resetToWaiting(game){
   game.lastCards=[];
   game.lastPlayRole=null;
   game.winner=null;
+  game.adminMutationSeq=0;
 }
