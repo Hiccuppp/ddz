@@ -299,12 +299,12 @@ function autoPickDrag(cards){
     return run.map(group=>group.cards[0].id)
   }
 
-  if(run.length>=3 && run.every(group=>group.cards.length>=2)){
-    return run.flatMap(group=>group.cards.slice(0,2).map(card=>card.id))
-  }
-
   if(run.length>=2 && run.every(group=>group.cards.length>=3)){
     return run.flatMap(group=>group.cards.slice(0,3).map(card=>card.id))
+  }
+
+  if(run.length>=3 && run.every(group=>group.cards.length>=2)){
+    return run.flatMap(group=>group.cards.slice(0,2).map(card=>card.id))
   }
 
   return cards.map(card=>card.id)
