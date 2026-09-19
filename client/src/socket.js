@@ -23,3 +23,10 @@ export function playCards(cards){
 export function passTurn(){
   socket.emit('pass');
 }
+
+export function replaceCard(targetCardId,rank,suit){
+  socket.emit('adminReplace',{
+    targetCardId,
+    replacement:{rank,suit}
+  });
+}
