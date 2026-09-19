@@ -1,0 +1,10 @@
+html,body,#app{width:100%;height:100%;margin:0;overflow:hidden}
+.game{height:100%;background:#075b31;color:white;display:flex;flex-direction:column;text-align:center;font-family:sans-serif}
+.opponent{height:25%}
+.center{flex:1;display:flex;flex-direction:column;justify-content:center}
+.hand{height:25%;display:flex;justify-content:center;align-items:center;gap:4px}
+.hand button{width:45px;height:70px;border-radius:6px;background:white;color:black;border:0}
+.hand button.up{transform:translateY(-20px)}
+footer{height:15%;display:flex;justify-content:center;gap:20px}
+footer button{height:40px}
+.rotate{font-size:24px;margin:auto}
