@@ -81,6 +81,39 @@ https://你的域名/
 https://你的域名/admin?key=管理员密码
 ```
 
+## Ubuntu 一键部署（公开仓库）
+
+仓库设为 Public 后，全新的 Ubuntu 22.04 服务器只需要执行：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Hiccuppp/ddz/main/install.sh | sudo bash
+```
+
+脚本会依次询问：
+
+- 游戏域名
+- 管理员密码
+- Let's Encrypt 邮箱（可选）
+- 是否立即开启 HTTPS
+
+然后自动完成：
+
+- clone 最新代码
+- 安装 Node.js 20 / npm / Git / Nginx / PM2 / Certbot
+- 安装前后端依赖
+- 运行服务端测试和构建前端
+- 启动 Node.js 服务
+- 配置 PM2 开机启动
+- 配置 Nginx 和 Socket.IO WebSocket 反向代理
+- 可选自动申请 Let's Encrypt HTTPS
+
+也可以完全非交互部署：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Hiccuppp/ddz/main/install.sh | \
+  sudo env DOMAIN=ddz.example.com ADMIN_KEY='your-password' SSL_EMAIL='you@example.com' ENABLE_SSL=Y bash
+```
+
 ## Ubuntu 22.04 部署
 
 服务器克隆仓库后：
