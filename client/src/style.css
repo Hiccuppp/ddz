@@ -1,6 +1,6 @@
 *{box-sizing:border-box}
 html,body,#app{width:100%;height:100%;margin:0;overflow:hidden}
-button{font:inherit}
+button,select{font:inherit}
 .game{height:100%;min-height:100%;background:radial-gradient(circle at center,#147447 0,#075b31 70%);color:#fff;display:flex;flex-direction:column;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;user-select:none;-webkit-user-select:none}
 .rotate{margin:auto;font-size:26px;font-weight:700}
 .topbar{height:38px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:rgba(0,0,0,.18);font-size:13px}
@@ -10,7 +10,7 @@ button{font:inherit}
 .backs{height:48px;display:flex;justify-content:center;align-items:center}
 .back{display:inline-flex;width:27px;height:42px;margin-left:-13px;border:2px solid #fff;border-radius:4px;background:#163b86;align-items:center;justify-content:center;font-size:28px;overflow:hidden;box-shadow:0 2px 4px rgba(0,0,0,.3)}
 .back:first-child{margin-left:0}
-.table-center{flex:1;min-height:100px;display:flex;flex-direction:column;justify-content:center;padding:0 12px}
+.table-center{flex:1;min-height:92px;display:flex;flex-direction:column;justify-content:center;padding:0 12px}
 .info-row{display:grid;grid-template-columns:90px 1fr 110px;align-items:center;gap:10px}
 .info-box{display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;min-height:58px;background:rgba(0,0,0,.12);border-radius:10px;padding:4px}
 .bottom-cards{display:flex}
@@ -21,10 +21,17 @@ button{font:inherit}
 .hint{opacity:.82;font-size:14px}
 .message{height:22px;text-align:center;font-size:13px;padding-top:3px}
 .message.error{color:#ffd1d1;font-weight:700}
-.admin-peek{height:42px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:rgba(104,36,145,.24);font-size:11px;padding:2px 10px}
-.admin-peek .card+.card{margin-left:-16px}
-.my-area{height:31%;min-height:120px;display:flex;flex-direction:column;justify-content:flex-end}
-.hand-row{height:90px;display:flex;justify-content:center;align-items:flex-end;padding:0 22px 4px;overflow:visible}
+.admin-panel{height:68px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;background:rgba(77,23,111,.38);padding:5px 10px}
+.admin-hand{min-width:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.admin-label{font-size:11px;margin-right:8px;white-space:nowrap}
+.admin-hand .card+.card{margin-left:-16px}
+.admin-hand .card.selected{transform:translateY(-5px);border-color:#ffe26f}
+.admin-controls{display:flex;gap:5px;align-items:center}
+.admin-controls select,.admin-controls button{height:30px;border:0;border-radius:6px;padding:0 7px}
+.admin-controls button{background:#f1ce59;color:#352900;font-weight:700}
+.admin-controls button:disabled{opacity:.45}
+.my-area{height:30%;min-height:112px;display:flex;flex-direction:column;justify-content:flex-end}
+.hand-row{height:86px;display:flex;justify-content:center;align-items:flex-end;padding:0 22px 4px;overflow:visible}
 .hand-row .card+.card{margin-left:-18px}
 .card{position:relative;width:44px;height:68px;padding:4px 3px;border:1px solid #d2d2d2;border-radius:6px;background:#fff;color:#171717;box-shadow:0 2px 5px rgba(0,0,0,.32);display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;transition:transform .12s ease,border-color .12s ease;flex:0 0 auto}
 .card.selected{transform:translateY(-18px);border:2px solid #ffd34d}
@@ -44,13 +51,15 @@ button{font:inherit}
 
 @media (max-height:430px){
   .topbar{height:30px}
-  .opponent{height:15%;min-height:58px}
-  .backs{height:38px}
-  .back{height:34px;width:23px;font-size:23px}
-  .table-center{min-height:80px}
+  .opponent{height:14%;min-height:54px}
+  .backs{height:34px}
+  .back{height:32px;width:22px;font-size:22px}
+  .table-center{min-height:74px}
   .info-row{grid-template-columns:78px 1fr 96px}
-  .my-area{height:30%;min-height:104px}
-  .hand-row{height:76px}
+  .admin-panel{height:58px}
+  .admin-hand .card{height:42px;width:30px}
+  .my-area{height:28%;min-height:96px}
+  .hand-row{height:72px}
   .card{width:40px;height:61px}
-  .actions{height:50px}
+  .actions{height:48px}
 }
