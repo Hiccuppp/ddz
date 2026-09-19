@@ -2,41 +2,87 @@ import express from 'express';
 import {createServer} from 'http';
 import {Server} from 'socket.io';
 import dotenv from 'dotenv';
-import {createGame,deal,callLandlord} from './game.js';
+import {createGame,deal,resetToWaiting,otherRole} from './game.js';
+import {registerGameEvents} from './events.js';
 
 dotenv.config();
+
 const app=express();
 const http=createServer(app);
 const io=new Server(http,{cors:{origin:'*'}});
 const game=createGame();
 
-function publicState(){
- return {
-  phase:game.phase,
-  players:Object.fromEntries(Object.entries(game.players).map(([k,v])=>[k,{count:v.hand.length}])) ,
-  flipCard:game.flipCard,
-  landlord:game.landlord,
-  turn:game.turn,
-  lastPlay:game.lastPlay
- };
+app.get('/health',(_req,res)=>res.json({ok:true,phase:game.phase}));
+
+function stateFor(role){
+  const me=game.players[role];
+  const opponentRole=otherRole(role);
+  const opponent=game.players[opponentRole];
+  const revealBottom=['playing','finished'].includes(game.phase);
+
+  return {
+    role,
+    phase:game.phase,
+    players:{
+      admin:{count:game.players.admin?.hand.length ?? 0,connected:Boolean(game.players.admin)},
+      player:{count:game.players.player?.hand.length ?? 0,connected:Boolean(game.players.player)}
+    },
+    hand:me?.hand ?? [],
+    opponentHand:role==='admin' ? (opponent?.hand ?? []) : undefined,
+    flipCard:game.flipCard,
+    bottom:revealBottom ? game.bottom : [],
+    landlord:game.landlord,
+    callPlayer:game.callPlayer,
+    robPlayer:game.robPlayer,
+    robCount:game.robCount,
+    robRounds:game.robRounds,
+    turn:game.turn,
+    lastPlay:game.lastPlay,
+    lastCards:game.lastCards,
+    lastPlayRole:game.lastPlayRole,
+    winner:game.winner
+  };
+}
+
+function broadcast(){
+  for(const role of ['admin','player']){
+    const player=game.players[role];
+    if(player) io.to(player.id).emit('state',stateFor(role));
+  }
 }
 
 io.on('connection',socket=>{
- socket.on('join',({role,key})=>{
-  if(role==='admin' && key!==process.env.ADMIN_KEY) return socket.disconnect();
-  if(!['admin','player'].includes(role)) return;
-  if(game.players[role]) return socket.emit('error','room full');
-  game.players[role]={id:socket.id,hand:[]};
-  socket.role=role;
-  socket.emit('state',game);
-  if(Object.keys(game.players).length===2){deal(game);io.emit('state',publicState());}
- });
+  socket.on('join',({role,key}={})=>{
+    if(!['admin','player'].includes(role)){
+      return socket.emit('joinError','无效玩家类型');
+    }
+    if(role==='admin' && key!==process.env.ADMIN_KEY){
+      return socket.emit('joinError','管理员密码错误');
+    }
+    if(socket.role) return;
+    if(game.players[role]){
+      return socket.emit('joinError',role==='admin'?'管理员位置已占用':'房间已满');
+    }
+    if(Object.keys(game.players).length>=2){
+      return socket.emit('joinError','房间已满');
+    }
 
- socket.on('call',value=>{
-  if(callLandlord(game,socket.role,value)) io.emit('state',publicState());
- });
+    game.players[role]={id:socket.id,hand:[]};
+    socket.role=role;
 
- socket.on('disconnect',()=>{if(socket.role) delete game.players[socket.role];});
+    if(game.players.admin && game.players.player) deal(game);
+    broadcast();
+  });
+
+  registerGameEvents(socket,game,broadcast);
+
+  socket.on('disconnect',()=>{
+    if(!socket.role) return;
+    delete game.players[socket.role];
+    resetToWaiting(game);
+    broadcast();
+  });
 });
 
-http.listen(process.env.PORT||3000);
+const port=Number(process.env.PORT)||3000;
+http.listen(port,()=>console.log(`DDZ server listening on :${port}`));
