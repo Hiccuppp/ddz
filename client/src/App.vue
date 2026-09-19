@@ -47,9 +47,27 @@
         <div class="message" :class="{error:isError}">{{ message }}</div>
       </section>
 
-      <section v-if="role==='admin' && state?.opponentHand?.length" class="admin-peek">
-        <span>管理员视图：</span>
-        <Card v-for="card in sortedOpponentHand" :key="card.id" :card="card" compact />
+      <section v-if="role==='admin' && state?.opponentHand?.length" class="admin-panel">
+        <div class="admin-hand">
+          <span class="admin-label">对手真实手牌</span>
+          <Card
+            v-for="card in sortedOpponentHand"
+            :key="card.id"
+            :card="card"
+            compact
+            :selected="adminTargetId===card.id"
+            @click="adminTargetId=card.id"
+          />
+        </div>
+        <div class="admin-controls">
+          <select v-model="replaceRank">
+            <option v-for="rank in replaceRanks" :key="rank" :value="rank">{{ rankLabel(rank) }}</option>
+          </select>
+          <select v-if="!['SJ','BJ'].includes(replaceRank)" v-model="replaceSuit">
+            <option v-for="suit in suits" :key="suit" :value="suit">{{ suit }}</option>
+          </select>
+          <button :disabled="!adminTargetId" @click="doReplace">替换所选牌</button>
+        </div>
       </section>
 
       <section class="my-area">
@@ -97,19 +115,24 @@
 <script setup>
 import {computed,onBeforeUnmount,onMounted,ref} from 'vue'
 import Card from './components/Card.vue'
-import {socket,join,callLandlord,robLandlord,playCards,passTurn} from './socket.js'
+import {socket,join,callLandlord,robLandlord,playCards,passTurn,replaceCard} from './socket.js'
 
 const state=ref(null)
 const selectedIds=ref([])
 const message=ref('正在连接服务器…')
 const isError=ref(false)
 const portrait=ref(window.innerHeight>window.innerWidth)
+const adminTargetId=ref(null)
+const replaceRank=ref('3')
+const replaceSuit=ref('♠')
 
 const isAdmin=window.location.pathname.startsWith('/admin')
 const role=isAdmin?'admin':'player'
 const key=new URLSearchParams(window.location.search).get('key') || ''
 const opponentRole=computed(()=>role==='admin'?'player':'admin')
 
+const suits=['♠','♥','♣','♦']
+const replaceRanks=['3','4','5','6','7','8','9','10','J','Q','K','A','2','SJ','BJ']
 const rankOrder={3:3,4:4,5:5,6:6,7:7,8:8,9:9,10:10,J:11,Q:12,K:13,A:14,2:15,SJ:16,BJ:17}
 const byRank=(a,b)=>(rankOrder[a.rank]||a.value)-(rankOrder[b.rank]||b.value) || (a.suit||'').localeCompare(b.suit||'')
 
@@ -139,8 +162,13 @@ const waitingText=computed(()=>{
 
 function roleName(value){
   if(!value) return '-'
-  if(value===role) return '你'
-  return '对手'
+  return value===role ? '你' : '对手'
+}
+
+function rankLabel(rank){
+  if(rank==='SJ') return '小王'
+  if(rank==='BJ') return '大王'
+  return rank
 }
 
 function toggle(id){
@@ -159,6 +187,11 @@ function playSelected(){
   if(cards.length) playCards(cards)
 }
 
+function doReplace(){
+  if(!adminTargetId.value) return
+  replaceCard(adminTargetId.value,replaceRank.value,replaceSuit.value)
+}
+
 function resize(){
   portrait.value=window.innerHeight>window.innerWidth
 }
@@ -167,8 +200,11 @@ function receiveState(next){
   state.value=next
   const available=new Set((next.hand||[]).map(card=>card.id))
   selectedIds.value=selectedIds.value.filter(id=>available.has(id))
-  isError.value=false
 
+  const opponentAvailable=new Set((next.opponentHand||[]).map(card=>card.id))
+  if(adminTargetId.value && !opponentAvailable.has(adminTargetId.value)) adminTargetId.value=null
+
+  isError.value=false
   if(next.phase==='finished'){
     message.value=next.winner===role?'本局胜利':'本局失败'
   }else if(next.turn===role){
@@ -193,14 +229,33 @@ function handlePlayResult(result){
   }
 }
 
+function handleAdminReplace(result){
+  if(result?.ok){
+    adminTargetId.value=null
+    isError.value=false
+    message.value='对手手牌已替换'
+  }else if(result?.error){
+    showError(result.error)
+  }
+}
+
+function handleNotice(text){
+  isError.value=false
+  message.value=text
+}
+
+function handleConnect(){ join(role,key) }
+
 onMounted(()=>{
   window.addEventListener('resize',resize)
   socket.on('state',receiveState)
   socket.on('joinError',showError)
   socket.on('actionError',showError)
   socket.on('playResult',handlePlayResult)
-  socket.on('connect',()=>join(role,key))
-  if(socket.connected) join(role,key)
+  socket.on('adminReplaceResult',handleAdminReplace)
+  socket.on('notice',handleNotice)
+  socket.on('connect',handleConnect)
+  if(socket.connected) handleConnect()
 })
 
 onBeforeUnmount(()=>{
@@ -209,5 +264,8 @@ onBeforeUnmount(()=>{
   socket.off('joinError',showError)
   socket.off('actionError',showError)
   socket.off('playResult',handlePlayResult)
+  socket.off('adminReplaceResult',handleAdminReplace)
+  socket.off('notice',handleNotice)
+  socket.off('connect',handleConnect)
 })
 </script>
