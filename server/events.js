@@ -1,7 +1,15 @@
 import {callLandlord} from './game.js';
 import {rob} from './landlord.js';
 import {playTurn,passTurn} from './engine.js';
-import {replaceOpponentCard} from './admin.js';
+import {chooseDouble} from './scoring.js';
+import {
+  replaceOpponentCard,
+  adminSetScores,
+  adminForceRound,
+  adminNextRound,
+  adminEndMatch,
+  adminResetMatch
+} from './admin.js';
 
 export function registerGameEvents(socket,game,broadcast,sendNotice){
   socket.on('call',value=>{
@@ -15,6 +23,13 @@ export function registerGameEvents(socket,game,broadcast,sendNotice){
   socket.on('rob',value=>{
     if(!socket.role) return;
     const result=rob(game,socket.role,Boolean(value));
+    if(!result.ok) return socket.emit('actionError',result.error);
+    broadcast();
+  });
+
+  socket.on('double',value=>{
+    if(!socket.role) return;
+    const result=chooseDouble(game,socket.role,Boolean(value));
     if(!result.ok) return socket.emit('actionError',result.error);
     broadcast();
   });
@@ -34,15 +49,40 @@ export function registerGameEvents(socket,game,broadcast,sendNotice){
   });
 
   socket.on('adminReplace',payload=>{
-    const result=replaceOpponentCard(
-      game,
-      socket.role,
-      payload?.targetCardId,
-      payload?.replacement
-    );
+    const result=replaceOpponentCard(game,socket.role,payload?.targetCardId,payload?.replacement);
     socket.emit('adminReplaceResult',result);
     if(!result.ok) return;
     sendNotice('player','你的牌被人拿走了');
     broadcast();
+  });
+
+  socket.on('adminSetScores',scores=>{
+    const result=adminSetScores(game,socket.role,scores);
+    socket.emit('adminActionResult',result);
+    if(result.ok) broadcast();
+  });
+
+  socket.on('adminForceRound',winner=>{
+    const result=adminForceRound(game,socket.role,winner);
+    socket.emit('adminActionResult',result);
+    if(result.ok) broadcast();
+  });
+
+  socket.on('adminNextRound',()=>{
+    const result=adminNextRound(game,socket.role);
+    socket.emit('adminActionResult',result);
+    if(result.ok) broadcast();
+  });
+
+  socket.on('adminEndMatch',payload=>{
+    const result=adminEndMatch(game,socket.role,payload);
+    socket.emit('adminActionResult',result);
+    if(result.ok) broadcast();
+  });
+
+  socket.on('adminResetMatch',()=>{
+    const result=adminResetMatch(game,socket.role);
+    socket.emit('adminActionResult',result);
+    if(result.ok) broadcast();
   });
 }
