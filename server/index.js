@@ -16,16 +16,23 @@ const http=createServer(app);
 const io=new Server(http,{cors:{origin:'*'}});
 const game=createGame();
 
-app.get('/health',(_req,res)=>res.json({ok:true,phase:game.phase}));
+app.get('/health',(_req,res)=>res.json({ok:true,phase:game.phase,round:game.roundNumber}));
 
 function stateFor(role){
   const me=game.players[role];
   const opponentRole=otherRole(role);
   const opponent=game.players[opponentRole];
-  const revealBottom=['playing','finished'].includes(game.phase);
+  const revealBottom=['double','playing','finished','match_finished'].includes(game.phase);
+
   return {
     role,
     phase:game.phase,
+    maxRounds:game.maxRounds,
+    roundNumber:game.roundNumber,
+    completedRounds:game.completedRounds,
+    scores:game.scores,
+    matchEnded:game.matchEnded,
+    matchWinner:game.matchWinner,
     players:{
       admin:{count:game.players.admin?.hand.length ?? 0,connected:Boolean(game.players.admin)},
       player:{count:game.players.player?.hand.length ?? 0,connected:Boolean(game.players.player)}
@@ -35,10 +42,19 @@ function stateFor(role){
     flipCard:game.flipCard,
     bottom:revealBottom ? game.bottom : [],
     landlord:game.landlord,
+    farmer:game.farmer,
     callPlayer:game.callPlayer,
     robPlayer:game.robPlayer,
     robCount:game.robCount,
     robRounds:game.robRounds,
+    robMultiplier:game.robMultiplier,
+    bombCount:game.bombCount,
+    bombMultiplier:game.bombMultiplier,
+    doubleChoices:game.doubleChoices,
+    doublePlayer:game.doublePlayer,
+    multiplier:game.multiplier,
+    roundScore:game.roundScore,
+    roundDelta:game.roundDelta,
     turn:game.turn,
     lastPlay:game.lastPlay,
     lastCards:game.lastCards,
@@ -64,7 +80,7 @@ io.on('connection',socket=>{
 
     game.players[role]={id:socket.id,hand:[]};
     socket.role=role;
-    if(game.players.admin && game.players.player) deal(game);
+    if(game.players.admin && game.players.player && !game.matchEnded) deal(game);
     broadcast();
   });
 
