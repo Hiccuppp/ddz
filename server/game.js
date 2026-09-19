@@ -8,6 +8,12 @@ export function createGame(){
   return {
     players:{},
     phase:'waiting',
+    maxRounds:8,
+    roundNumber:1,
+    completedRounds:0,
+    scores:{admin:0,player:0},
+    matchEnded:false,
+    matchWinner:null,
     deck:[],
     bottom:[],
     flipCard:null,
@@ -20,6 +26,8 @@ export function createGame(){
     robCount:0,
     robPassStreak:0,
     robMultiplier:1,
+    bombCount:0,
+    bombMultiplier:1,
     baseScore:1,
     doubleChoices:{admin:null,player:null},
     doublePlayer:null,
@@ -37,7 +45,10 @@ export function createGame(){
 }
 
 export function deal(game){
+  if(game.matchEnded || game.completedRounds>=game.maxRounds) return game;
+
   const cards=shuffle(createDeck()).slice(0,45);
+  game.roundNumber=game.completedRounds+1;
   game.deck=cards;
   game.bottom=cards.slice(42);
   game.players.admin.hand=cards.slice(0,21);
@@ -54,6 +65,8 @@ export function deal(game){
   game.robCount=0;
   game.robPassStreak=0;
   game.robMultiplier=1;
+  game.bombCount=0;
+  game.bombMultiplier=1;
   game.doubleChoices={admin:null,player:null};
   game.doublePlayer=null;
   game.multiplier=1;
@@ -121,6 +134,8 @@ export function resetToWaiting(game){
   game.robCount=0;
   game.robPassStreak=0;
   game.robMultiplier=1;
+  game.bombCount=0;
+  game.bombMultiplier=1;
   game.doubleChoices={admin:null,player:null};
   game.doublePlayer=null;
   game.multiplier=1;
@@ -133,4 +148,15 @@ export function resetToWaiting(game){
   game.lastPlayRole=null;
   game.winner=null;
   game.adminMutationSeq=0;
+}
+
+export function resetMatch(game){
+  game.maxRounds=8;
+  game.roundNumber=1;
+  game.completedRounds=0;
+  game.scores={admin:0,player:0};
+  game.matchEnded=false;
+  game.matchWinner=null;
+  resetToWaiting(game);
+  if(game.players.admin && game.players.player) deal(game);
 }
