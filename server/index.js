@@ -2,9 +2,13 @@ import express from 'express';
 import {createServer} from 'http';
 import {Server} from 'socket.io';
 import dotenv from 'dotenv';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
 import {createGame,deal,resetToWaiting,otherRole} from './game.js';
 import {registerGameEvents} from './events.js';
 
+const __dirname=path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({path:path.resolve(__dirname,'../.env')});
 dotenv.config();
 
 const app=express();
