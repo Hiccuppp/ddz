@@ -12,12 +12,21 @@ export function createGame(){
     bottom:[],
     flipCard:null,
     landlord:null,
+    farmer:null,
     callPlayer:null,
     callPasses:0,
     robPlayer:null,
     robRounds:0,
     robCount:0,
     robPassStreak:0,
+    robMultiplier:1,
+    baseScore:1,
+    doubleChoices:{admin:null,player:null},
+    doublePlayer:null,
+    multiplier:1,
+    roundScore:0,
+    roundDelta:{admin:0,player:0},
+    roundSettled:false,
     turn:null,
     lastPlay:null,
     lastCards:[],
@@ -39,10 +48,18 @@ export function deal(game){
   game.callPlayer=findPlayerByCard(game,game.flipCard);
   game.callPasses=0;
   game.landlord=null;
+  game.farmer=null;
   game.robPlayer=null;
   game.robRounds=0;
   game.robCount=0;
   game.robPassStreak=0;
+  game.robMultiplier=1;
+  game.doubleChoices={admin:null,player:null};
+  game.doublePlayer=null;
+  game.multiplier=1;
+  game.roundScore=0;
+  game.roundDelta={admin:0,player:0};
+  game.roundSettled=false;
   game.turn=game.callPlayer;
   game.lastPlay=null;
   game.lastCards=[];
@@ -72,6 +89,8 @@ export function callLandlord(game,role,call){
     game.robRounds=0;
     game.robCount=0;
     game.robPassStreak=0;
+    game.robMultiplier=1;
+    game.multiplier=1;
     return true;
   }
 
@@ -94,12 +113,20 @@ export function resetToWaiting(game){
   game.bottom=[];
   game.flipCard=null;
   game.landlord=null;
+  game.farmer=null;
   game.callPlayer=null;
   game.callPasses=0;
   game.robPlayer=null;
   game.robRounds=0;
   game.robCount=0;
   game.robPassStreak=0;
+  game.robMultiplier=1;
+  game.doubleChoices={admin:null,player:null};
+  game.doublePlayer=null;
+  game.multiplier=1;
+  game.roundScore=0;
+  game.roundDelta={admin:0,player:0};
+  game.roundSettled=false;
   game.turn=null;
   game.lastPlay=null;
   game.lastCards=[];
