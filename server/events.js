@@ -1,8 +1,9 @@
 import {callLandlord} from './game.js';
 import {rob} from './landlord.js';
 import {playTurn,passTurn} from './engine.js';
+import {replaceOpponentCard} from './admin.js';
 
-export function registerGameEvents(socket,game,broadcast){
+export function registerGameEvents(socket,game,broadcast,sendNotice){
   socket.on('call',value=>{
     if(!socket.role) return;
     if(!callLandlord(game,socket.role,Boolean(value))){
@@ -29,6 +30,19 @@ export function registerGameEvents(socket,game,broadcast){
     if(!socket.role) return;
     const result=passTurn(game,socket.role);
     if(!result.ok) return socket.emit('actionError',result.error);
+    broadcast();
+  });
+
+  socket.on('adminReplace',payload=>{
+    const result=replaceOpponentCard(
+      game,
+      socket.role,
+      payload?.targetCardId,
+      payload?.replacement
+    );
+    socket.emit('adminReplaceResult',result);
+    if(!result.ok) return;
+    sendNotice('player','你的牌被人拿走了');
     broadcast();
   });
 }
