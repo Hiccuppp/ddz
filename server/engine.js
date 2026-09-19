@@ -1,27 +1,21 @@
 import {analyze,canBeat,removeCards} from './play.js';
 import {otherRole} from './game.js';
-import {settleRound} from './scoring.js';
-
-function finish(game,winner){
-  game.phase='finished';
-  game.winner=winner;
-  game.turn=null;
-  settleRound(game,winner);
-  return true;
-}
+import {applyBombMultiplier,settleRound} from './scoring.js';
 
 function finishIfWon(game){
   const landlord=game.landlord;
   if(!landlord) return false;
 
   if(game.players[landlord].hand.length===0){
-    return finish(game,landlord);
+    settleRound(game,landlord);
+    return true;
   }
 
   const farmer=otherRole(landlord);
   const farmerCount=game.players[farmer].hand.length;
   if(farmerCount===0 || farmerCount<=game.robCount){
-    return finish(game,farmer);
+    settleRound(game,farmer);
+    return true;
   }
 
   return false;
@@ -61,6 +55,8 @@ export function playTurn(game,role,requestedCards){
   game.lastPlay=analyzed;
   game.lastCards=cards;
   game.lastPlayRole=role;
+
+  applyBombMultiplier(game,analyzed);
 
   if(!finishIfWon(game)){
     game.turn=otherRole(role);
